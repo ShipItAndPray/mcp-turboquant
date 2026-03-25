@@ -1,0 +1,10 @@
+{
+  "name": "mcp-turboquant",
+  "version": "0.1.0",
+  "description": "MCP server for LLM quantization — compress any model to GGUF, GPTQ, or AWQ",
+  "main": "index.js",
+  "bin": { "mcp-turboquant": "index.js" },
+  "keywords": ["mcp", "mcp-server", "quantization", "llm", "gguf", "gptq", "awq", "model-compression", "turboquant"],
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/ShipItAndPray/mcp-turboquant" }
+}
