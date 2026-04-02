@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-turboquant"
+version = "1.0.0"
+description = "MCP server for LLM quantization. Compress any HuggingFace model to GGUF, GPTQ, or AWQ."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "ShipItAndPray" },
+]
+keywords = ["mcp", "llm", "quantization", "gguf", "gptq", "awq", "compression"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "mcp>=1.0.0",
+    "huggingface-hub>=0.20.0",
+    "requests",
+]
+
+[project.optional-dependencies]
+gguf = [
+    "llama-cpp-python>=0.2.0",
+]
+gptq = [
+    "torch>=2.0.0",
+    "transformers>=4.36.0",
+    "auto-gptq>=0.7.0",
+    "datasets>=2.14.0",
+]
+awq = [
+    "torch>=2.0.0",
+    "transformers>=4.36.0",
+    "autoawq>=0.2.0",
+]
+all = [
+    "mcp-turboquant[gguf,gptq,awq]",
+]
+
+[project.scripts]
+mcp-turboquant = "mcp_turboquant.server:main"
+
+[project.urls]
+Homepage = "https://github.com/ShipItAndPray/mcp-turboquant"
+Repository = "https://github.com/ShipItAndPray/mcp-turboquant"
+Issues = "https://github.com/ShipItAndPray/mcp-turboquant/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mcp_turboquant"]

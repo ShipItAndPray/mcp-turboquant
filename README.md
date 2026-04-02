@@ -1,51 +1,63 @@
 # mcp-turboquant
 
-The first MCP server for LLM quantization. Compress any Hugging Face model to **GGUF**, **GPTQ**, or **AWQ** format in a single tool call.
+Self-contained Python MCP server for LLM quantization. Compress any HuggingFace model to **GGUF**, **GPTQ**, or **AWQ** format in a single tool call.
 
-Built on [TurboQuant](https://github.com/ShipItAndPray/turboquant) — the unified CLI for model compression.
-
-## Why?
-
-LLM quantization is one of the most common tasks in the open-source AI workflow, yet there has been no way for AI assistants to do it autonomously. Until now.
-
-With `mcp-turboquant`, Claude (or any MCP-compatible agent) can:
-
-- **Quantize models** — convert any HF model to GGUF/GPTQ/AWQ with specified bit widths
-- **Inspect models** — get parameter counts, architecture details, and size estimates
-- **Recommend settings** — analyze your hardware and suggest optimal format + bits
-- **Check backends** — verify which quantization engines are installed
+No external CLI required -- all quantization logic is embedded.
 
 ## Install
 
-### Prerequisites
+```bash
+pip install mcp-turboquant
+```
+
+Or run directly with uvx:
 
 ```bash
-pip install turboquant
+uvx mcp-turboquant
 ```
+
+### Optional backends
+
+The `info`, `check`, and `recommend` tools work out of the box. For actual quantization, install the backend you need:
+
+```bash
+# GGUF (Ollama, llama.cpp, LM Studio)
+pip install mcp-turboquant[gguf]
+
+# GPTQ (vLLM, TGI)
+pip install mcp-turboquant[gptq]
+
+# AWQ (vLLM, TGI)
+pip install mcp-turboquant[awq]
+
+# Everything
+pip install mcp-turboquant[all]
+```
+
+## Configure
 
 ### Claude Code
 
-Add to your Claude Code MCP settings (`~/.claude/settings.json`):
+Add to `~/.claude/settings.json`:
 
 ```json
 {
   "mcpServers": {
     "turboquant": {
-      "command": "npx",
-      "args": ["-y", "mcp-turboquant"]
+      "command": "mcp-turboquant"
     }
   }
 }
 ```
 
-Or run locally:
+Or with uvx (no install needed):
 
 ```json
 {
   "mcpServers": {
     "turboquant": {
-      "command": "node",
-      "args": ["/path/to/mcp-turboquant/index.js"]
+      "command": "uvx",
+      "args": ["mcp-turboquant"]
     }
   }
 }
@@ -59,8 +71,8 @@ Add to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "turboquant": {
-      "command": "npx",
-      "args": ["-y", "mcp-turboquant"]
+      "command": "uvx",
+      "args": ["mcp-turboquant"]
     }
   }
 }
@@ -68,34 +80,48 @@ Add to `claude_desktop_config.json`:
 
 ## Tools
 
-| Tool | Description |
-|------|-------------|
-| `quantize` | Quantize a HF model to GGUF/GPTQ/AWQ. Params: `model` (required), `format` (gguf/gptq/awq), `bits` (2-8), `output` (path) |
-| `info` | Get model info — param count, architecture, size estimates |
-| `recommend` | Hardware-aware recommendation for best format and bit width |
-| `check` | List available quantization backends on the system |
+| Tool | Description | Heavy deps? |
+|------|-------------|-------------|
+| `info` | Get model info from HuggingFace (params, size, architecture) | No |
+| `check` | Check available quantization backends on the system | No |
+| `recommend` | Hardware-aware recommendation for best format + bits | No |
+| `quantize` | Quantize a model to GGUF/GPTQ/AWQ | Yes |
+| `evaluate` | Run perplexity evaluation on a quantized model | Yes |
+| `push` | Push quantized model to HuggingFace Hub | No |
 
 ## Examples
 
-Once configured, just ask Claude:
+Once configured, ask Claude:
 
-> "Quantize meta-llama/Llama-3.1-8B to 4-bit GGUF"
+> "Get info on meta-llama/Llama-3.1-8B-Instruct"
 
 > "What quantization format should I use for Mistral-7B on my machine?"
 
+> "Quantize meta-llama/Llama-3.1-8B to 4-bit GGUF"
+
 > "Check which quantization backends I have installed"
 
-> "Get info on microsoft/phi-3-mini-4k-instruct"
+> "Evaluate the perplexity of my quantized model at /path/to/model.gguf"
 
-## How It Works
+> "Push my quantized model to myuser/model-GGUF on HuggingFace"
 
-`mcp-turboquant` is a lightweight Node.js process that speaks JSON-RPC over stdio (the MCP transport protocol). When an AI assistant calls a tool, the server shells out to the `turboquant` CLI and returns the output.
+## How it works
 
 ```
-Claude / Agent  <-->  MCP Protocol (stdio)  <-->  mcp-turboquant  <-->  turboquant CLI  <-->  llama.cpp / auto-gptq / autoawq
+Claude / Agent  <-->  MCP Protocol (stdio)  <-->  mcp-turboquant (Python)  <-->  llama-cpp-python / auto-gptq / autoawq
 ```
 
-No dependencies beyond Node.js and a working `turboquant` installation.
+All quantization logic runs in-process. No external CLI tools needed.
+
+## Run directly
+
+```bash
+# As a command
+mcp-turboquant
+
+# As a module
+python -m mcp_turboquant
+```
 
 ## License
 

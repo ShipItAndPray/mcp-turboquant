@@ -1,11 +1,14 @@
 {
   "name": "mcp-turboquant",
   "display_name": "TurboQuant MCP Server",
-  "description": "MCP server for LLM quantization. Compress any Hugging Face model to GGUF, GPTQ, or AWQ format in one tool call.",
-  "version": "0.1.0",
+  "description": "MCP server for LLM quantization. Compress any HuggingFace model to GGUF, GPTQ, or AWQ format in one tool call.",
+  "version": "1.0.0",
   "author": "ShipItAndPray",
   "license": "MIT",
   "repository": "https://github.com/ShipItAndPray/mcp-turboquant",
   "categories": ["ai", "machine-learning", "quantization"],
-  "tools": ["quantize", "info", "recommend", "check"]
+  "tools": ["info", "check", "recommend", "quantize", "evaluate", "push"],
+  "runtime": "python",
+  "install": "pip install mcp-turboquant",
+  "command": "mcp-turboquant"
 }
